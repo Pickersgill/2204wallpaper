@@ -1,6 +1,7 @@
 import numpy as np
 import random
 import math
+import sys
 import style as s
 from PIL import Image, ImageDraw
 
@@ -27,8 +28,14 @@ class Grid:
         y1 = c.y - c.r
         x2 = c.x + c.r
         y2 = c.y + c.r
-        self.drw.ellipse([x1, y1, x2, y2], fill=s.BORDER_COL)
         self.drw.ellipse([x1+s.B, y1+s.B, x2-s.B, y2-s.B], fill=c.c)
+
+    def draw_border(self, c):
+        x1 = c.x - c.r
+        y1 = c.y - c.r
+        x2 = c.x + c.r
+        y2 = c.y + c.r
+        self.drw.ellipse([x1, y1, x2, y2], fill=s.BORDER_COL)
         
 
     def intersect(self, c1, c2):
@@ -64,15 +71,16 @@ class Grid:
             if self.intersect(new_c, c):
                 return False
                 
-        print("Found a nice spot for this cool circle!")
         return new_c
         
     def spawn(self, c):
         self.circles.append(c)
 
     def render(self):
-        for c in self.circles:
-            self.draw_circle(c)
+        for c1 in self.circles:
+            self.draw_border(c1)
+        for c2 in self.circles:
+            self.draw_circle(c2)
         
 grid = Grid(s.W, s.H, s.BG)
 
@@ -90,30 +98,49 @@ def bin_g(i):
     return g
 
 def lin_g(i):
-    return 100 / (i+1)
+    return 1 - ((1 / (s.K * s.N + 1)) * i)
 
 def unit_g(i):
     
     return 1
 
+def inv_exp_g(i):
+    term = 1 - (1 / (((1000 * s.N) - 1) * s.K)) * i ** 2
+    return term
+
+
 curr_r = s.INIT_R
-g = log_g
+g = lin_g
+
+BAR = "▂"
+B_LEN = 80
+
+print("Generating image...")
 
 for i in range(1, s.N):
     c = False
     attempts = 0
+
+    complete = (i // (s.N // B_LEN))
+    sys.stdout.write("\033[92m")
+    sys.stdout.write(BAR * complete)
+    sys.stdout.write("\033[90m")
+    sys.stdout.write(BAR * (B_LEN - complete))
+    sys.stdout.write("\b" * B_LEN)
+    sys.stdout.flush()
+                
     while c == False and attempts < s.ATTEMPT_CUTOFF:
         c = grid.try_fill(r=curr_r)
         attempts += 1
 
     if attempts < s.ATTEMPT_CUTOFF:
         grid.spawn(c.copy())
-    else:
-        err = "Failed to fit circle %d of size %d"
-        print(err % (i, curr_r))
 
     curr_r = int(s.INIT_R * g(i))
-        
-        
+
+sys.stdout.write("\b" * B_LEN)
+sys.stdout.flush()
+
+print("\nRendering image...")
 grid.render()
 grid.img.show()
