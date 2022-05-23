@@ -11,6 +11,8 @@ class Circle:
         self.y = y
         self.r = r
         self.c = c
+        self.fill = c[0]
+        self.border = c[1]
         
     def copy(self):
         return Circle(self.x, self.y, self.r, self.c)
@@ -28,14 +30,14 @@ class Grid:
         y1 = c.y - c.r
         x2 = c.x + c.r
         y2 = c.y + c.r
-        self.drw.ellipse([x1+s.B, y1+s.B, x2-s.B, y2-s.B], fill=c.c)
+        self.drw.ellipse([x1+s.B, y1+s.B, x2-s.B, y2-s.B], fill=c.fill)
 
     def draw_border(self, c):
         x1 = c.x - c.r
         y1 = c.y - c.r
         x2 = c.x + c.r
         y2 = c.y + c.r
-        self.drw.ellipse([x1, y1, x2, y2], fill=s.BORDER_COL)
+        self.drw.ellipse([x1, y1, x2, y2], fill=c.border)
         
 
     def intersect(self, c1, c2):
@@ -121,7 +123,8 @@ for i in range(1, s.N):
     c = False
     attempts = 0
 
-    complete = (i // (s.N // B_LEN))
+    complete = int(i // (s.N / B_LEN)) + 1
+
     sys.stdout.write("\033[92m")
     sys.stdout.write(BAR * complete)
     sys.stdout.write("\033[90m")
@@ -138,9 +141,8 @@ for i in range(1, s.N):
 
     curr_r = int(s.INIT_R * g(i))
 
-sys.stdout.write("\b" * B_LEN)
-sys.stdout.flush()
 
 print("\nRendering image...")
 grid.render()
 grid.img.show()
+grid.img.save("img.png")

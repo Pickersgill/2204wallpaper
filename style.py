@@ -1,20 +1,23 @@
 W = 1920
 H = 1080
-BG = r"#ffffff"
+BG = r"#000000"
+BORDER_COL = BG
 COLS = [
-    "#fcba03",
-    "#fc8003",
-    "#03a5fc",
-    "#fc3103",
+    #("#0ba32c", "#ebe723"), #land
+    #("#767a77", "#a8ada9"), #rock
+    #("#005b82", "#009fe3"), #sea
+    ("#ff2f00", BORDER_COL),#red
+    ("#ffb300", BORDER_COL),#yellow
+    ("#3865fc", BORDER_COL),#blue
 ]
-BORDER_COL = "#000000"
+
 
 N = 10000
-INIT_R = 150
-ATTEMPT_CUTOFF = 20
-K = 1
+INIT_R = 100
+ATTEMPT_CUTOFF = 300
+K = 1.7
 
-B = 5
+B = 10
 C_COL = r"#000000"
 R_MIN = 400
 R_MAX = 500
